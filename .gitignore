@@ -6,3 +6,9 @@ __MACOSX/
 dashboard/node_modules/
 dashboard/.next/
 dashboard/.env.local
+.synthesis-credentials
+.moltbook-credentials
+.agentmail-credentials
+demo-video/node_modules/
+demo-video/out/*.wav
+demo-video/out/chrysalis-video-only.mp4
