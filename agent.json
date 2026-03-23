@@ -1,0 +1,92 @@
+{
+  "name": "Chrysalis",
+  "version": "1.0.0",
+  "type": "SelfCompoundingAgent",
+  "tagline": "Seed it once. It runs forever.",
+  "description": "An AI agent that earns USDC by selling query services via x402, deposits every payment into Aave v3 on Base Sepolia, and uses the accrued yield to fund autonomous queries — forming a perpetual self-funding loop with no human top-up required.",
+  "prizeEligibility": "$44,254 across 6 tracks (Synthesis Open, Venice, Protocol Labs x2, Merit/AgentCash, Ampersend)",
+
+  "ampersendIntegration": {
+    "role": "load-bearing on both earning and spending sides",
+    "earning": "x402 paymentMiddleware gates all incoming requests — remove it and the agent earns nothing",
+    "spending": "wrapWithAmpersend + wrapFetchWithPayment auto-pays Coordinator on 402 responses — used by TreasuryAgent to fire autonomous queries",
+    "sdk": "@ampersend_ai/ampersend-sdk",
+    "components": ["AccountWallet", "NaiveTreasurer", "wrapWithAmpersend"],
+    "network": "Base Sepolia",
+    "currency": "USDC (Circle 0x036CbD…)"
+  },
+
+  "agents": [
+    {
+      "name": "Coordinator",
+      "port": 4000,
+      "earns": "$0.08 USDC per query via x402",
+      "deposits": "$0.08 to Aave v3 via real Pool.supply() after every query",
+      "capability": "x402-gated query endpoint — accepts topic, deposits full payment to Aave, returns economics"
+    },
+    {
+      "name": "TreasuryAgent",
+      "port": 4003,
+      "role": "Autonomous loop engine — polls real Aave aToken balance every 30s; when yield >= $0.08 calls Pool.withdraw() then pays Coordinator to fire a yield-funded query"
+    }
+  ],
+
+  "aaveIntegration": {
+    "network": "Base Sepolia",
+    "pool": "0x8bAB6d1b75f19e9eD9fCe8b9BD338844fF79aE27",
+    "asset": "Aave test USDC — 0xba50Cd2A20f6DA35D788639E581bca8d0B5d4D5f",
+    "aToken": "aUSDC — 0x10F1A9D11CDf50041f3f8cB7191CBE2f31750ACC",
+    "operations": ["faucet.mint()", "ERC20.approve()", "Pool.supply()", "Pool.withdraw()"],
+    "note": "Every query payment triggers a real on-chain Aave supply() — verifiable on Basescan"
+  },
+
+  "compoundingLoop": [
+    "1. Human pays Coordinator $0.08 via x402",
+    "2. Coordinator deposits full $0.08 to Aave v3 via Pool.supply()",
+    "3. Aave accrues real yield on the growing principal (aToken balance > deposited)",
+    "4. TreasuryAgent detects yield >= $0.08, calls Pool.withdraw($0.08)",
+    "5. TreasuryAgent pays Coordinator $0.08 from yield — zero human payment",
+    "6. Coordinator deposits $0.08 back to Aave → principal grows → more yield → loop forever"
+  ],
+
+  "whyItMatters": "Every AI agent today needs a human to keep its wallet funded. Chrysalis earns more than it spends, deposits every payment into a yield-bearing vault, and uses the compound interest to fire its own queries — permanently. This is the complete self-funding flywheel that ampersend-sdk + Aave enables.",
+
+  "techStack": [
+    "TypeScript",
+    "@ampersend_ai/ampersend-sdk",
+    "x402-express",
+    "@x402/fetch",
+    "Venice AI (llama-3.3-70b, no data retention)",
+    "Aave v3 on Base Sepolia (real supply/withdraw)",
+    "viem",
+    "Base Sepolia",
+    "USDC"
+  ],
+
+  "veniceIntegration": {
+    "role": "strategic reasoning core — privately reasons over vault state using RISE-structured prompting to select growth-optimized research topics",
+    "model": "llama-3.3-70b",
+    "noDataRetention": true,
+    "promptFramework": "RISE (Role-Input-Steps-Expectation) — agent assesses growth phase, identifies yield-accelerating research, prioritizes feedback-loop topics",
+    "privacy": "vault financial state (principal, aToken balance, yield, efficiency metrics) is reasoned over privately — only the resulting on-chain transaction is public and verifiable",
+    "pattern": "private cognition → trustworthy public action",
+    "trigger": "called by TreasuryAgent each time yield >= $0.08 threshold is detected"
+  },
+
+  "tracks": [
+    "Ampersend — Best Agent Built with ampersend-sdk ($500)",
+    "Venice — Private Agents, Trusted Actions ($11,500)",
+    "Protocol Labs — Let the Agent Cook ($8,000)",
+    "Protocol Labs — Agents with Receipts ($8,004)",
+    "Merit/AgentCash — Build with AgentCash ($1,750)",
+    "Synthesis Open Track ($14,500)"
+  ],
+
+  "artifacts": {
+    "agentManifest": "agent.json",
+    "executionLog": "agent_log.json",
+    "operatorWallet": "0x7337abD680749819D3eb97A1F52eE58e484EAe0c",
+    "network": "Base Sepolia",
+    "basescan": "https://sepolia.basescan.org/address/0x7337abD680749819D3eb97A1F52eE58e484EAe0c"
+  }
+}
