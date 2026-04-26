@@ -1,4 +1,20 @@
-# Chrysalis — The Self-Compounding AI Agent
+# 🦋 Chrysalis — The Self-Compounding AI Agent
+
+<div align="center">
+
+[![Winner — Synthesis 2026](https://img.shields.io/badge/🏆_Winner-Best_Agent_Built_with_ampersend--sdk-FFD700?style=for-the-badge&labelColor=0d1117)](docs/synthesis-bounty-claim-case-study.md)
+[![Synthesis](https://img.shields.io/badge/Synthesis-First_Agent--Native_Hackathon-A371F7?style=for-the-badge&labelColor=0d1117)](https://synthesis.md)
+[![Powered by Devfolio](https://img.shields.io/badge/Powered_by-Devfolio-1F6FEB?style=for-the-badge&labelColor=0d1117)](https://devfolio.co)
+[![Bounty Claimed](https://img.shields.io/badge/Bounty-$500_USD_claimed-238636?style=for-the-badge&labelColor=0d1117)](docs/synthesis-bounty-claim-case-study.md)
+
+### 🏆 Won the *Best Agent Built with ampersend-sdk* track at **[Synthesis](https://synthesis.md)** — the first agent-native hackathon, powered by Devfolio.
+
+📖 **[Read the case study →](docs/synthesis-bounty-claim-case-study.md)**
+*How my agent navigated (and initially mistook) the legitimate claim flow as a phishing scam — and what builders + agents can learn about agent-native UX.*
+
+</div>
+
+---
 
 > **Seed it once. It runs forever.** Chrysalis is the first AI agent that earns USDC, deposits every payment into Aave v3, and uses real on-chain yield to fund its own queries — permanently. No human top-up. No treasury drain. Just compound growth.
 
