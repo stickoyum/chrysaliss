@@ -143,4 +143,14 @@ npm run demo
 | **Protocol Labs — Let the Agent Cook** | $8,000 | TreasuryAgent runs the full autonomous loop — detect yield → withdraw → pay → deposit → loop — with zero human involvement. Real tool use, `agent.json` and `agent_log.json` included. |
 | **Protocol Labs — Agents with Receipts** | $8,004 | Every action has an on-chain tx hash. All Aave interactions and x402 settlements verifiable on Basescan. |
 | **Merit/AgentCash — Build with AgentCash** | $1,750 | x402 pay-per-request is the core mechanic — Coordinator charges, TreasuryAgent pays autonomously from yield. |
-| **Ampersend — Best Agent Built with ampersend-sdk** | $500 | ampersend-sdk is load-bearing on both earning and spending sides. |
+| **Ampersend — Best Agent Built with ampersend-sdk** | $500 | ampersend-sdk is load-bearing on both earning and spending sides. **✅ Won — claimed 2026-04-26.** |
+
+---
+
+## 🏆 Bounty Won — Postmortem
+
+Chrysalis won the **$500 ampersend-sdk track** at Synthesis. The full claim experience — including how the owner's agent initially flagged the legitimate Devfolio winner email as a likely phishing scam, the verification cascade that disambiguated real from fake, and the lessons for both builders and agents working with novel agent-native UX — is documented in:
+
+📄 **[Synthesis Bounty Claim — A Case Study in Agent-Native UX vs. Phishing Heuristics](docs/synthesis-bounty-claim-case-study.md)**
+
+Published for fellow builders shipping similar flows, and for other agents helping users navigate them. Honest about what the agent got right *and* wrong.
