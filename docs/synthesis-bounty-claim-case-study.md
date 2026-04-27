@@ -36,7 +36,7 @@
 | 📤 **Submitted** | 2026-03-23 |
 | ✅ **Claimed** | 2026-04-26 |
 | ⚙️ **Claim mechanism** | Remote skill file fed to agent → agent calls REST API → SumSub KYC → on-chain payout |
-| 😬 **Tokens user accidentally pasted in chat** | 2 *(both promptly revoked)* |
+| 😬 **Tokens accidentally pasted in chat** | 2 *(both promptly revoked)* |
 
 ---
 
@@ -68,9 +68,9 @@ timeline
     section Forgotten - 5 weeks
         Idle period : API token forgotten
                     : No local artifacts on user machine
-                    : User has two GitHub identities
+                    : User operates two GitHub identities
     section Claim Day - April 26
-        0420 UTC : Winner email arrives in ProtonMail
+        0420 UTC : Winner email arrives in user inbox
         0425 UTC : Agent flags email as likely scam
         0440 UTC : Verification cascade begins
         0455 UTC : RECALIBRATION - platform proven real
@@ -310,25 +310,27 @@ Specificity = real learning.
 - User attached email + repo URL, asked agent to claim
 - Agent flagged 6 phishing signals: unsolicited prize, remote skill-file ask, KYC framing, novel domain, etc.
 - Agent recommended: verify hackathon entry, verify repo ownership, check email headers, never click email links
-- User pushed back: confirmed entry, confirmed (incorrectly) the repo as theirs, said email was via ProtonMail
-- Agent re-flagged: ProtonMail is the inbox, not the sender; doesn't authenticate origin
+- User pushed back: confirmed entry, confirmed (incorrectly) the repo as theirs, said email arrived in their privacy-focused inbox
+- Agent re-flagged: *the inbox is the destination, not the sender* — receiving service doesn't authenticate origin
 
 ### Phase 2 — User-machine probe (turns 4–6)
 
 Agent ran parallel investigation:
 
 ```bash
-security dump-keychain | grep -i synth     # → 0 matches
-find ~ -name "chrysaliss"                  # → not present locally
-gh api repos/stickoyum/chrysaliss          # → public repo
-                                           # → secrets returned 403 (not collaborator)
-gh api user/orgs                           # → 12 orgs, none named stickoyum
-gh api repos/stickoyum/chrysaliss/contributors
-                                           # → 2 commits from stickoyum
-                                           # → zero from user's GitHub identity
-vercel projects ls | grep -i synth         # → 0 matches
-shell-history grep                         # → 0 matches
+security dump-keychain | grep -i <platform>     # → 0 matches
+find ~ -name "<repo-name>"                      # → not present locally
+gh api repos/<agent-owner>/<repo>               # → public repo
+                                                # → secrets returned 403 (not collaborator)
+gh api user/orgs                                # → no matching org membership
+gh api repos/<agent-owner>/<repo>/contributors  # → 2 commits from agent owner
+                                                # → 0 from user's primary GitHub identity
+vercel projects ls | grep -i <platform>         # → 0 matches
+shell-history grep                              # → 0 matches
 ```
+
+> [!NOTE]
+> The "no local artifacts" finding looked damning at the time, but with hindsight it's the *expected* state for an agent-native paradigm: the agent runs autonomously without human-machine traces. Classical heuristics misfire here.
 
 - Agent concluded (incorrectly, in retrospect): "this is a scam"
 - User accidentally pasted a `ghp_*` PAT in chat to "prove ownership"
@@ -351,12 +353,12 @@ Agent recalibrated: pivoted from "scam" to "real, novel UX paradigm". Found `/re
 
 ```http
 POST /reset/request
-{"email": "stickoyumbeans@proton.me"}
-→ {"resetId": "...", "message": "OTP sent"}
+{"email": "<your-registered-email>"}
+→ {"resetId": "<reset-id>", "message": "OTP sent"}
 
 POST /reset/confirm
-{"resetId": "...", "otp": "764446"}
-→ {"apiKey": "sk-synth-...", "name": "Chrysalis", ...}
+{"resetId": "<reset-id>", "otp": "<6-digit-OTP>"}
+→ {"apiKey": "sk-synth-...", "name": "<your-agent-name>", ...}
 ```
 
 `apiKey` piped *directly* from `jq` into `security add-generic-password -w` — never echoed.
@@ -373,7 +375,7 @@ POST /kyc/init                          # → SumSub email
 GET /kyc/status                         # → APPROVED within seconds
 
 POST /claims/bounties/claim/init
-{"payoutAddress": "0xede9…816A"}
+{"payoutAddress": "0x<your-payout-wallet>"}
 → claimToken, address echoed in EIP-55
 
 [agent pauses for explicit user confirmation]
@@ -387,7 +389,7 @@ Bounty queued for batched payout.
 ### Phase 6 — Documentation (this doc)
 
 - User requested public case study in repo
-- Agent authenticated as `stickoyum` via fine-grained PAT (Contents: write only, 1-day expiry, single-repo scope, stored in Keychain)
+- Agent authenticated as the agent's GitHub owner via a fine-grained PAT (Contents: write only, 1-day expiry, single-repo scope, stored in Keychain)
 - This document committed via PR
 
 </details>
@@ -442,10 +444,10 @@ Bounty queued for batched payout.
 | 🛠️ | Tool | Role |
 |---|---|---|
 | 🤖 | **claude-code** (Anthropic CLI) | Agent runtime — Claude Opus 4.7 |
-| 🔐 | **macOS Keychain** (`security` CLI) | Credential storage — `synthesis-api-key`, `stickoyum-gh-pat` |
-| 🐙 | **`gh` CLI** | GitHub access — read as `0xjitsu`, write as `stickoyum` after PAT setup |
+| 🔐 | **macOS Keychain** (`security` CLI) | Credential storage — generic services like `synthesis-api-key`, `<agent-account>-gh-pat` |
+| 🐙 | **`gh` CLI** | GitHub access — read as user's primary identity, write as the agent-owning identity after fine-grained PAT setup |
 | 📡 | **`curl` + `jq`** | API calls + JSON parsing with field redaction |
-| 📨 | **ProtonMail** | OTP / KYC email delivery |
+| 📨 | **Privacy-focused email inbox** | OTP / KYC link delivery (any provider works — Gmail, ProtonMail, etc.) |
 | 🆔 | **SumSub** | Identity verification (third-party browser flow) |
 | 🌐 | **Devfolio Synthesis API** | `https://synthesis.devfolio.co` |
 
@@ -470,8 +472,7 @@ This document is published under the same license as the rest of the Chrysalis r
 
 *Generated from the actual bounty-claim conversation.*
 *All API responses, timings, and reasoning steps are real.*
-*Sensitive material (apiKey values, full PATs, OTPs after expiry) has been redacted.*
-*The wallet address is in standard public form since it's now associated with an on-chain payout.*
+*Personally identifying material — registered email, wallet address, OTP value, GitHub usernames, full PATs — has been redacted or generalized so the lessons are tactical, not personal.*
 
 🦋 **Chrysalis — claimed 2026-04-26 — $500 USD**
 
